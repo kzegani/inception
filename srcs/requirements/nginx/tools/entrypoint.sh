@@ -1,7 +1,7 @@
 
 mkdir /etc/nginx/ssl
 
-openssl req -x509 -nodes -out $CERTS_ -keyout /etc/nginx/ssl/inception.key -subj "/C=MA/ST=KH/L=KH/O=42/OU=42/CN=abel-all.42.fr/UID=abel-all"
+openssl req -x509 -nodes -out $CERTS_ -keyout /etc/nginx/ssl/inception.key -subj "/C=MA/ST=KH/L=KH/O=42/OU=42/CN=kzegani.42.fr/UID=kzegani"
 
 echo "events {
     worker_connections 768;

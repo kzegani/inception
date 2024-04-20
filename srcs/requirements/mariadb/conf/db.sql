@@ -1,0 +1,4 @@
+CREATE DATABASE IF NOT EXISTS wp_inception_db;
+CREATE USER 'kzegani'@'%' IDENTIFIED BY '123';
+GRANT ALL PRIVILEGES ON wp_inception_db.* TO 'kzegani'@'%';
+FLUSH PRIVILEGES;

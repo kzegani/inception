@@ -1,11 +1,10 @@
 FROM debian:bullseye
 
-RUN apt update
+RUN apt update && apt install mariadb-server -y
 
-RUN apt install mariadb-server -y
+COPY conf/db.sql /
+COPY conf/db_root.sql /
 
-RUN sed -i "s/127.0.0.1/0.0.0.0/g"	/etc/mysql/mariadb.conf.d/50-server.cnf
+COPY tools/entrypoint.sh .
 
-COPY tools/script.sh .
-
-CMD bash script.sh
+CMD bash entrypoint.sh

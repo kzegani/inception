@@ -1,56 +1,65 @@
-version: "3"
+version: '3.9'
 
 volumes:
- wordpress:
-  driver: local
-  driver_opts:
-   o: bind
-   type: none
-   device: /home/abel-all/data/wordpress
- mariadb:
-  driver: local
-  driver_opts:
-   o: bind
-   type: none
-   device: /home/abel-all/data/mariadb
+  wordpress:
+    name: wordpress_volume
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/kzegani/data/wordpress
+
+  DB:
+    name: mariadb_volume
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/kzegani/data/DB
 
 networks:
- inception:
-  name: inception
+  inception:
+    name: inception
 
 services:
- wordpress:
-  container_name: wordpress
-  build: ./requirements/wordpress/.
-  volumes:
-   - wordpress:/var/www/html/wordpress
-  networks:
-   - inception
-  image: wordpress
-  env_file:
-   - .env
-  restart: on-failure
- mariadb:
-  container_name: mariadb
-  build: ./requirements/mariadb/.
-  volumes:
-   - mariadb:/var/lib/mysql/
-  networks:
-   - inception
-  image: mariadb
-  env_file:
-   - .env
-  restart: on-failure
- nginx:
-  container_name: nginx
-  build: ./requirements/nginx/.
-  ports:
-   - 443:443
-  volumes:
-   - wordpress:/var/www/html/wordpress
-  networks:
-   - inception
-  env_file:
-   - .env
-  image: nginx
-  restart: on-failure
+  nginx:
+    build: ./requirements/nginx
+    image: nginx
+    container_name: nginx
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress:/var/www/html/wordpress
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: on-failure
+
+  mariadb:
+    build: ./requirements/mariadb
+    image: mariadb
+    container_name: mariadb
+    volumes:
+      - DB:/var/lib/mysql/
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: on-failure
+
+  wordpress:
+    build: ./requirements/wordpress
+    image: wordpress
+    container_name: wordpress
+    volumes:
+      - wordpress:/var/www/html/wordpress
+    depends_on:
+      - nginx
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: on-failure
