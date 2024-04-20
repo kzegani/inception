@@ -26,6 +26,6 @@ sed -i "s|listen = /run/php/php7.4-fpm.sock|listen = 0.0.0.0:9000|g"	/etc/php/7.
 
 wp core install --url=$DOMAIN_NAME --title=inception --admin_user=$MYSQL_USER --admin_password=$MYSQL_PASSWORD --admin_email=$WP_EMAIL --allow-root
 
-wp user create wp_kzegani khalid.zeganii@gmail.com --role=author --user_pass=123 --allow-root
+wp user create kzegani khalid.zegani@gmail.com --role=author --user_pass=123 --allow-root
 
 php-fpm7.4 -F
