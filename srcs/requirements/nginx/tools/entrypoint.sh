@@ -1,3 +1,4 @@
+#!/bin/bash
 
 mkdir /etc/nginx/ssl
 
@@ -21,7 +22,7 @@ http {
 
         ssl_certificate $CERTS_;
         ssl_certificate_key /etc/nginx/ssl/inception.key;
-        ssl_protocols TLSv1.3;
+        ssl_protocols TLSv1.2 TLSv1.3;
 
         access_log /var/log/nginx/wordpress_access.log;
         error_log /var/log/nginx/wordpress_error.log;
@@ -37,6 +38,15 @@ http {
             fastcgi_read_timeout 3600s;
             fastcgi_buffer_size 128k;
             fastcgi_buffers 4 128k;
+        }
+    }
+
+    server {
+        listen 443 ssl;
+        server_name ai.$DOMAIN_NAME;
+
+        location / {
+            proxy_pass http://192.168.1.2:8080;
         }
     }
 }" > /etc/nginx/nginx.conf

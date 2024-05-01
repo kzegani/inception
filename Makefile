@@ -1,13 +1,23 @@
-all: build upd
+COMPOSE = docker-compose -f ./srcs/docker-compose.yml
 
-build:
-	docker-compose -f ./srcs/docker-compose.yml build
+all: build-main upd-main
 
-upd:
-	docker-compose -f ./srcs/docker-compose.yml up -d
+build-main:
+	$(COMPOSE) build nginx mariadb wordpress
 
-up:
-	docker-compose -f ./srcs/docker-compose.yml up
+upd-main:
+	$(COMPOSE) up -d nginx mariadb wordpress
+
+bonus: build-bonus upd-bonus
+
+build-bonus:
+	$(COMPOSE) build html adminer cadvisor ftp redis
+
+upd-bonus:
+	$(COMPOSE) up -d html adminer cadvisor ftp redis
+
+logs:
+	$(COMPOSE) logs
 
 clean: down
 	docker image prune
@@ -15,19 +25,38 @@ clean: down
 fclean: down
 	docker rmi wordpress nginx mariadb
 	docker volume rm mariadb_volume wordpress_volume
+	docker volume prune
+	rm -rf /home/kzegani/data/wordpress/*
 
 down:
-	docker-compose -f ./srcs/docker-compose.yml down
+	$(COMPOSE) down
 
 stop:
-	docker-compose -f ./srcs/docker-compose.yml stop
+	$(COMPOSE) stop
 
 start:
-	docker-compose -f ./srcs/docker-compose.yml start
+	$(COMPOSE) start
 
 clean-images:
 	docker system prune -a -f
 
-re: clean all
+clean-hard:
+	docker stop $$(docker ps -a -q)
+	docker rm $$(docker ps -a -q)
+	docker rmi $$(docker images -a -q)
+	docker volume prune
+	docker network prune
+	docker system prune --all --volumes
+
+clean-42:
+	docker stop $$(docker ps -qa)
+	docker rm $$(docker ps -a -q)
+	docker rmi -f $$(docker images -qa)
+	docker volume rm $$(docker volume ls -q)
+	docker network rm $$(docker network ls -q) 2>/dev/null
+
+re: fclean all
+
+run: all bonus
 
 .PHONY: all build up fclean down stop start clean-images

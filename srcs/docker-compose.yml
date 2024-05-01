@@ -20,6 +20,10 @@ volumes:
 networks:
   inception:
     name: inception
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
 
 services:
   nginx:
@@ -33,7 +37,8 @@ services:
     depends_on:
       - mariadb
     networks:
-      - inception
+      inception:
+        ipv4_address: 192.168.1.3
     env_file:
       - .env
     restart: on-failure
@@ -45,7 +50,8 @@ services:
     volumes:
       - DB:/var/lib/mysql/
     networks:
-      - inception
+      inception:
+        ipv4_address: 192.168.1.4
     env_file:
       - .env
     restart: on-failure
@@ -59,7 +65,71 @@ services:
     depends_on:
       - nginx
     networks:
-      - inception
+      inception:
+        ipv4_address: 192.168.1.5
     env_file:
       - .env
+    restart: on-failure
+
+  html:
+    build: ./requirements/bonus/html
+    image: html
+    container_name: html
+    networks:
+      inception:
+        ipv4_address: 192.168.1.2
+    env_file:
+      - .env
+    restart: on-failure
+
+  redis:
+    build: ./requirements/bonus/redis
+    image: redis
+    container_name: redis
+    networks:
+      inception:
+        ipv4_address: 192.168.1.6
+    restart: on-failure
+
+  adminer:
+    build: ./requirements/bonus/adminer
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8081:80"
+    networks:
+      inception:
+        ipv4_address: 192.168.1.7
+    volumes:
+      - DB:/var/lib/mysql/
+    restart: on-failure
+
+  cadvisor:
+    build: ./requirements/bonus/cadvisor
+    image: cadvisor
+    container_name: cadvisor
+    ports:
+      - "8082:8080"
+    networks:
+      inception:
+        ipv4_address: 192.168.1.8
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    restart: on-failure
+
+  ftp:
+    build: ./requirements/bonus/ftp
+    image: ftp
+    container_name: ftp
+    ports:
+      - "20:20"
+    networks:
+      inception:
+        ipv4_address: 192.168.1.9
+    volumes:
+      - wordpress:/home/kzegani
     restart: on-failure
